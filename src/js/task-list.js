@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import propTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
+import propTypes from 'prop-types'
 
 import Task from './task'
 
@@ -8,10 +8,14 @@ import '../css/task-list.css'
 
 class TaskList extends Component {
   onEditTask = (id, description) => {
-    this.props.onEdit(id, description)
+    const { onEdit } = this.props
+    onEdit(id, description)
   }
+
   render() {
-    const { data, deleteItem, onToggleDone, filter } = this.props
+    const {
+      data, deleteItem, onToggleDone, filter,
+    } = this.props
 
     let filteredData = data
 
@@ -22,10 +26,13 @@ class TaskList extends Component {
     }
 
     const elements = filteredData.map((item) => {
-      const createdTimeAgo = formatDistanceToNow(item.timeOfCreation, {
-        includeSeconds: true,
-        addSuffix: true,
-      })
+      const createdTimeAgo = formatDistanceToNow(
+        item.timeOfCreation,
+        {
+          includeSeconds: true,
+          addSuffix: true,
+        },
+      )
       return (
         <Task
           key={item.id}
@@ -52,11 +59,11 @@ TaskList.propTypes = {
       editing: propTypes.bool.isRequired,
       description: propTypes.string.isRequired,
       timeOfCreation: propTypes.instanceOf(Date).isRequired,
-    })
-  ).isRequired,
+    }),
+  ),
   deleteItem: propTypes.func.isRequired,
   onToggleDone: propTypes.func.isRequired,
-  filter: propTypes.oneOf(['all', 'active', 'completed']).isRequired,
+  filter: propTypes.oneOf(['all', 'active', 'completed']),
   onEdit: propTypes.func.isRequired,
 }
 

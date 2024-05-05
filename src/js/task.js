@@ -7,8 +7,19 @@ export default class Task extends Component {
     editing: false,
     value: '',
   }
+
   getTaskStatus = () => {
-    return this.props.completed ? 'completed' : this.state.editing ? 'editing' : null
+    const { completed } = this.props
+    const { editing } = this.state
+    let str
+    if (completed) {
+      str = 'completed'
+    } else if (editing) {
+      str = 'editing'
+    } else {
+      str = null
+    }
+    return str
   }
 
   handleChange = (event) => {
@@ -17,38 +28,41 @@ export default class Task extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault()
-    this.props.onEdit(this.state.value)
+    const { onEdit } = this.props
+    const { value } = this.state
+    onEdit(value)
     this.setState({ value: '', editing: false })
   }
 
   render() {
-    const { description, deleteItem, onToggleDone, createdTimeAgo } = this.props
-    let taskStatus = this.getTaskStatus()
+    const { description, deleteItem, onToggleDone, createdTimeAgo, id } = this.props
+    const { value } = this.state
+    const taskStatus = this.getTaskStatus()
 
     return (
-      <li className={taskStatus} key={this.props.id}>
+      <li className={taskStatus} key={id}>
         <div className="view">
           <input className="toggle" type="checkbox" onClick={onToggleDone} />
-          <label>
+          <label htmlFor="btn">
             <span className="description">{description}</span>
             <span className="created">{createdTimeAgo}</span>
           </label>
           <button
+            id="btn"
+            type="button"
             className="icon icon-edit"
-            onClick={() =>
-              this.setState((prevState) => ({
-                editing: !prevState.editing,
-                value: this.props.description,
-              }))
-            }
-          ></button>
+            onClick={() => this.setState((prevState) => ({
+              editing: !prevState.editing,
+              value: description,
+            }))}
+          />
 
-          <button className="icon icon-destroy" onClick={deleteItem}></button>
+          <button type="button" className="icon icon-destroy" onClick={deleteItem} />
         </div>
 
         {taskStatus === 'editing' && (
           <form onSubmit={this.handleSubmit}>
-            <input type="text" className="edit" onChange={this.handleChange} value={this.state.value} autoFocus />
+            <input type="text" className="edit" onChange={this.handleChange} value={value} />
           </form>
         )}
       </li>

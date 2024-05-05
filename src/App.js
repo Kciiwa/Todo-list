@@ -13,6 +13,7 @@ class App extends Component {
     filter: 'all',
   }
 
+  // eslint-disable-next-line
   isInputValid(input) {
     return input.trim() !== ''
   }
@@ -60,7 +61,7 @@ class App extends Component {
 
   onFilterChange = (filter) => {
     this.setState({
-      filter: filter,
+      filter,
     })
   }
 
@@ -93,7 +94,8 @@ class App extends Component {
   }
 
   render() {
-    const itemsLeft = this.state.data.filter((el) => !el.completed).length
+    const { data, filter } = this.state
+    const itemsLeft = data.filter((el) => !el.completed).length
 
     return (
       <section className="todoapp">
@@ -105,17 +107,17 @@ class App extends Component {
         <section className="main">
           <TaskList
             className="hidden"
-            data={this.state.data}
+            data={data}
             deleteItem={this.deleteItem}
             onToggleDone={this.onToggleDone}
-            filter={this.state.filter}
+            filter={filter}
             onEdit={this.onEdit}
           />
           <Footer
             itemsLeft={itemsLeft}
             deleteAllCompleted={this.deleteAllCompleted}
             onFilterChange={this.onFilterChange}
-            filter={this.state.filter}
+            filter={filter}
           />
         </section>
       </section>

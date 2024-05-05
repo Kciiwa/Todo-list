@@ -14,22 +14,24 @@ export default class NewTaskForm extends Component {
   }
 
   onSubmit = (event) => {
+    const { addNewTodoItem } = this.props
+    const { description } = this.state
     event.preventDefault()
-    this.props.addNewTodoItem(this.state.description)
+    addNewTodoItem(description)
     this.setState({
       description: '',
     })
   }
 
   render() {
+    const { description } = this.state
     return (
       <form onSubmit={this.onSubmit}>
         <input
           className="new-todo"
           placeholder="What needs to be done?"
-          autoFocus
           onChange={this.onDescriptionChange}
-          value={this.state.description}
+          value={description}
         />
       </form>
     )
