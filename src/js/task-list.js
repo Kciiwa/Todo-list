@@ -13,9 +13,7 @@ class TaskList extends Component {
   }
 
   render() {
-    const {
-      data, deleteItem, onToggleDone, filter,
-    } = this.props
+    const { data, deleteItem, onToggleDone, filter } = this.props
 
     let filteredData = data
 
@@ -26,19 +24,17 @@ class TaskList extends Component {
     }
 
     const elements = filteredData.map((item) => {
-      const createdTimeAgo = formatDistanceToNow(
-        item.timeOfCreation,
-        {
-          includeSeconds: true,
-          addSuffix: true,
-        },
-      )
+      const createdTimeAgo = formatDistanceToNow(item.timeOfCreation, {
+        includeSeconds: true,
+        addSuffix: true,
+      })
       return (
         <Task
           key={item.id}
           completed={item.completed}
           editing={item.editing}
           description={item.description}
+          time={item.time}
           // time={item.time}
           deleteItem={() => deleteItem(item.id)}
           onToggleDone={() => onToggleDone(item.id)}
@@ -59,7 +55,7 @@ TaskList.propTypes = {
       editing: propTypes.bool.isRequired,
       description: propTypes.string.isRequired,
       timeOfCreation: propTypes.instanceOf(Date).isRequired,
-    }),
+    })
   ),
   deleteItem: propTypes.func.isRequired,
   onToggleDone: propTypes.func.isRequired,

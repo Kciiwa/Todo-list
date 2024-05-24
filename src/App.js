@@ -18,19 +18,20 @@ class App extends Component {
     return input.trim() !== ''
   }
 
-  createTodoItem(description) {
+  createTodoItem(description, min, sec) {
     return {
       id: this.maxId++,
       description,
       completed: false,
       editing: false,
       timeOfCreation: new Date(),
+      time: Number(min) * 60 + Number(sec),
     }
   }
 
-  addNewTodoItem = (description) => {
+  addNewTodoItem = (description, min, sec) => {
     if (this.isInputValid(description)) {
-      const newItem = this.createTodoItem(description)
+      const newItem = this.createTodoItem(description, min, sec)
       this.setState(({ data }) => {
         const newArr = [...data, newItem]
         return {

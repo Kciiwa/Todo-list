@@ -9,7 +9,8 @@
     "plugin:react/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
-    "airbnb"
+    "airbnb",
+    "prettier"
   ],
   "parser": "@babel/eslint-parser",
   "parserOptions": {

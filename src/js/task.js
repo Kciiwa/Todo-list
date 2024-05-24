@@ -3,9 +3,44 @@ import propTypes from 'prop-types'
 import '../css/task.css'
 
 export default class Task extends Component {
-  state = {
-    editing: false,
-    value: '',
+  constructor(props) {
+    super(props)
+    const { time } = props
+    this.state = {
+      editing: false,
+      value: '',
+      time,
+      timerIntervalId: null,
+    }
+  }
+
+  componentWillUnmount() {
+    const { timerIntervalId } = this.state
+    clearInterval(timerIntervalId)
+  }
+
+  updateTimer = () => {
+    this.setState((prevState) => ({
+      time: prevState.time - 1,
+    }))
+  }
+
+  startTimer = () => {
+    const { timerIntervalId } = this.state
+    if (!timerIntervalId) {
+      const newTimerIntervalId = setInterval(this.updateTimer, 1000)
+      this.setState({
+        timerIntervalId: newTimerIntervalId,
+      })
+    }
+  }
+
+  stopTimer = () => {
+    const { timerIntervalId } = this.state
+    clearInterval(timerIntervalId)
+    this.setState({
+      timerIntervalId: null,
+    })
   }
 
   getTaskStatus = () => {
@@ -36,7 +71,7 @@ export default class Task extends Component {
 
   render() {
     const { description, deleteItem, onToggleDone, createdTimeAgo, id } = this.props
-    const { value } = this.state
+    const { value, time } = this.state
     const taskStatus = this.getTaskStatus()
 
     return (
@@ -44,17 +79,25 @@ export default class Task extends Component {
         <div className="view">
           <input className="toggle" type="checkbox" onClick={onToggleDone} />
           <label htmlFor="btn">
-            <span className="description">{description}</span>
-            <span className="created">{createdTimeAgo}</span>
+            <span className="title">{description}</span>
+            <span className="description">
+              <button className="icon icon-play" type="button" onClick={this.startTimer} />
+              <button className="icon icon-pause" type="button" onClick={this.stopTimer} />
+              {`${Math.floor(time / 60)}:${(time % 60).toString().padStart(2, '0')}`}
+            </span>
+            <span className="description">{createdTimeAgo}</span>
           </label>
           <button
             id="btn"
             type="button"
             className="icon icon-edit"
-            onClick={() => this.setState((prevState) => ({
-              editing: !prevState.editing,
-              value: description,
-            }))}
+            onClick={(event) => {
+              event.stopPropagation()
+              this.setState((prevState) => ({
+                editing: !prevState.editing,
+                value: description,
+              }))
+            }}
           />
 
           <button type="button" className="icon icon-destroy" onClick={deleteItem} />
