@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import propTypes from 'prop-types'
-import '../css/new-task-form.css'
+import './new-task-form.css'
 
 export default class NewTaskForm extends Component {
   state = {
@@ -32,19 +32,6 @@ export default class NewTaskForm extends Component {
     const { description, min, sec } = this.state
     event.preventDefault()
 
-    const parsedMin = parseInt(min, 10)
-    const parsedSec = parseInt(sec, 10)
-    if (
-      Number.isNaN(parsedMin) ||
-      Number.isNaN(parsedSec) ||
-      parsedMin < 0 ||
-      parsedSec < 0 ||
-      parsedSec >= 60
-    ) {
-      alert('Введите корректное время')
-      return
-    }
-
     addNewTodoItem(description, min, sec)
     this.setState({
       description: '',
@@ -69,6 +56,8 @@ export default class NewTaskForm extends Component {
           placeholder="Min"
           onChange={this.onMinChange}
           value={min}
+          type="number"
+          min={0}
           required
         />
         <input
@@ -76,6 +65,8 @@ export default class NewTaskForm extends Component {
           placeholder="Sec"
           onChange={this.onSecChange}
           value={sec}
+          type="number"
+          min={0}
           required
         />
         <button type="submit" />

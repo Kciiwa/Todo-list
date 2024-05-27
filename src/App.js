@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 
 import './App.css'
-import NewTaskForm from './js/new-task-form'
-import TaskList from './js/task-list'
-import Footer from './js/footer'
+import NewTaskForm from './components/new-task-form/new-task-form'
+import TaskList from './components/task-list/task-list'
+import Footer from './components/footer/footer'
 
 class App extends Component {
   maxId = 100
@@ -15,7 +15,7 @@ class App extends Component {
 
   // eslint-disable-next-line
   isInputValid(input) {
-    return input.trim() !== ''
+    return typeof input === 'string' && input.trim() !== ''
   }
 
   createTodoItem(description, min, sec) {

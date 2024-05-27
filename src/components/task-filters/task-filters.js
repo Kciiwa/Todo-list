@@ -1,5 +1,5 @@
 import propTypes from 'prop-types'
-import '../css/tasks-filter.css'
+import './tasks-filter.css'
 
 function TaskFilters({ onFilterChange, filter = 'all' }) {
   return (

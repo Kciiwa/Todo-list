@@ -1,46 +1,22 @@
 import React, { Component } from 'react'
 import propTypes from 'prop-types'
-import '../css/task.css'
+import './task.css'
 
 export default class Task extends Component {
   constructor(props) {
     super(props)
-    const { time } = props
     this.state = {
       editing: false,
       value: '',
-      time,
-      timerIntervalId: null,
     }
+  }
+
+  componentDidMount() {
+    document.addEventListener('click', this.handleDocumentClick)
   }
 
   componentWillUnmount() {
-    const { timerIntervalId } = this.state
-    clearInterval(timerIntervalId)
-  }
-
-  updateTimer = () => {
-    this.setState((prevState) => ({
-      time: prevState.time - 1,
-    }))
-  }
-
-  startTimer = () => {
-    const { timerIntervalId } = this.state
-    if (!timerIntervalId) {
-      const newTimerIntervalId = setInterval(this.updateTimer, 1000)
-      this.setState({
-        timerIntervalId: newTimerIntervalId,
-      })
-    }
-  }
-
-  stopTimer = () => {
-    const { timerIntervalId } = this.state
-    clearInterval(timerIntervalId)
-    this.setState({
-      timerIntervalId: null,
-    })
+    document.removeEventListener('click', this.handleDocumentClick)
   }
 
   getTaskStatus = () => {
@@ -69,9 +45,31 @@ export default class Task extends Component {
     this.setState({ value: '', editing: false })
   }
 
+  onEscDown = (event) => {
+    if (event.keyCode === 27) {
+      this.setState({ editing: false })
+    }
+  }
+
+  handleDocumentClick = (event) => {
+    const editInput = document.querySelector('.edit')
+    if (editInput && !editInput.contains(event.target)) {
+      this.setState({ editing: false })
+    }
+  }
+
   render() {
-    const { description, deleteItem, onToggleDone, createdTimeAgo, id } = this.props
-    const { value, time } = this.state
+    const {
+      description,
+      deleteItem,
+      onToggleDone,
+      createdTimeAgo,
+      id,
+      timer,
+      startTimer,
+      stopTimer,
+    } = this.props
+    const { value } = this.state
     const taskStatus = this.getTaskStatus()
 
     return (
@@ -81,9 +79,9 @@ export default class Task extends Component {
           <label htmlFor="btn">
             <span className="title">{description}</span>
             <span className="description">
-              <button className="icon icon-play" type="button" onClick={this.startTimer} />
-              <button className="icon icon-pause" type="button" onClick={this.stopTimer} />
-              {`${Math.floor(time / 60)}:${(time % 60).toString().padStart(2, '0')}`}
+              <button className="icon icon-play" type="button" onClick={startTimer} />
+              <button className="icon icon-pause" type="button" onClick={stopTimer} />
+              {`${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')}`}
             </span>
             <span className="description">{createdTimeAgo}</span>
           </label>
@@ -105,7 +103,14 @@ export default class Task extends Component {
 
         {taskStatus === 'editing' && (
           <form onSubmit={this.handleSubmit}>
-            <input type="text" className="edit" onChange={this.handleChange} value={value} />
+            <input
+              type="text"
+              className="edit"
+              onChange={this.handleChange}
+              value={value}
+              onKeyDown={this.onEscDown}
+              // onClick={this.onWindowClick}
+            />
           </form>
         )}
       </li>
