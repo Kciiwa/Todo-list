@@ -1,26 +1,22 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 import './App.css'
 import NewTaskForm from './components/new-task-form/new-task-form'
 import TaskList from './components/task-list/task-list'
 import Footer from './components/footer/footer'
 
-class App extends Component {
-  maxId = 100
+function App() {
+  const [data, setData] = useState([])
+  const [filter, setFilter] = useState('all')
 
-  state = {
-    data: [],
-    filter: 'all',
-  }
-
-  // eslint-disable-next-line
-  isInputValid(input) {
+  function isInputValid(input) {
     return typeof input === 'string' && input.trim() !== ''
   }
 
-  createTodoItem(description, min, sec) {
+  function createTodoItem(description, min, sec) {
     return {
-      id: this.maxId++,
+      id: uuidv4(),
       description,
       completed: false,
       editing: false,
@@ -29,101 +25,86 @@ class App extends Component {
     }
   }
 
-  addNewTodoItem = (description, min, sec) => {
-    if (this.isInputValid(description)) {
-      const newItem = this.createTodoItem(description, min, sec)
-      this.setState(({ data }) => {
-        const newArr = [...data, newItem]
-        return {
-          data: newArr,
-        }
+  const addNewTodoItem = (description, min, sec) => {
+    if (isInputValid(description)) {
+      const newItem = createTodoItem(description, min, sec)
+      setData((prevData) => {
+        const newArr = [...prevData, newItem]
+        return newArr
       })
     }
   }
 
-  deleteItem = (id) => {
-    this.setState(({ data }) => {
-      const index = data.findIndex((el) => el.id === id)
-      const newArray = [...data.slice(0, index), ...data.slice(index + 1)]
-      return {
-        data: newArray,
-      }
+  const deleteItem = (id) => {
+    setData((prevData) => {
+      const index = prevData.findIndex((el) => el.id === id)
+      const newArray = [...prevData.slice(0, index), ...prevData.slice(index + 1)]
+      return newArray
     })
   }
 
-  deleteAllCompleted = () => {
-    this.setState(({ data }) => {
-      const newArr = data.filter((item) => !item.completed)
-      return {
-        data: newArr,
-      }
+  const deleteAllCompleted = () => {
+    setData((prevData) => {
+      const newArr = prevData.filter((item) => !item.completed)
+      return newArr
     })
   }
 
-  onFilterChange = (filter) => {
-    this.setState({
-      filter,
-    })
+  const onFilterChange = (newFilter) => {
+    setFilter(newFilter)
   }
 
-  onToggleDone = (id) => {
-    this.setState(({ data }) => {
-      const index = data.findIndex((el) => el.id === id)
-      const oldItem = data[index]
+  const onToggleDone = (id) => {
+    setData((prevData) => {
+      const index = prevData.findIndex((el) => el.id === id)
+      const oldItem = prevData[index]
       const newItem = { ...oldItem, completed: !oldItem.completed }
 
-      const newArray = [...data.slice(0, index), newItem, ...data.slice(index + 1)]
-      return {
-        data: newArray,
-      }
+      const newArray = [...prevData.slice(0, index), newItem, ...prevData.slice(index + 1)]
+      return newArray
     })
   }
 
-  onEdit = (id, value) => {
-    if (this.isInputValid(value)) {
-      this.setState(({ data }) => {
-        const index = data.findIndex((el) => el.id === id)
-        const oldItem = data[index]
+  const onEdit = (id, value) => {
+    if (isInputValid(value)) {
+      setData((prevData) => {
+        const index = prevData.findIndex((el) => el.id === id)
+        const oldItem = prevData[index]
         const updatedItem = { ...oldItem, editing: true, description: value }
-        const newData = [...data.slice(0, index), updatedItem, ...data.slice(index + 1)]
+        const newData = [...prevData.slice(0, index), updatedItem, ...prevData.slice(index + 1)]
 
-        return {
-          data: newData,
-        }
+        return newData
       })
     }
   }
 
-  render() {
-    const { data, filter } = this.state
-    const itemsLeft = data.filter((el) => !el.completed).length
+  const itemsLeft = data.filter((el) => !el.completed).length
 
-    return (
-      <section className="todoapp">
-        <header className="header">
-          <h1>todos</h1>
-          <NewTaskForm addNewTodoItem={this.addNewTodoItem} />
-        </header>
+  return (
+    <section className="todoapp">
+      <header className="header">
+        <h1>todos</h1>
+        <NewTaskForm addNewTodoItem={addNewTodoItem} />
+      </header>
 
-        <section className="main">
-          <TaskList
-            className="hidden"
-            data={data}
-            deleteItem={this.deleteItem}
-            onToggleDone={this.onToggleDone}
-            filter={filter}
-            onEdit={this.onEdit}
-          />
-          <Footer
-            itemsLeft={itemsLeft}
-            deleteAllCompleted={this.deleteAllCompleted}
-            onFilterChange={this.onFilterChange}
-            filter={filter}
-          />
-        </section>
+      <section className="main">
+        <TaskList
+          className="hidden"
+          data={data}
+          deleteItem={deleteItem}
+          onToggleDone={onToggleDone}
+          filter={filter}
+          onEdit={onEdit}
+        />
+        <Footer
+          itemsLeft={itemsLeft}
+          deleteAllCompleted={deleteAllCompleted}
+          onFilterChange={onFilterChange}
+          filter={filter}
+        />
       </section>
-    )
-  }
+    </section>
+  )
 }
 
 export default App

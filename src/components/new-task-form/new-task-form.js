@@ -1,78 +1,63 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import propTypes from 'prop-types'
 import './new-task-form.css'
 
-export default class NewTaskForm extends Component {
-  state = {
-    description: '',
-    min: '',
-    sec: '',
+export default function NewTaskForm({ addNewTodoItem }) {
+  const [description, setDescription] = useState('')
+  const [min, setMin] = useState('')
+  const [sec, setSec] = useState('')
+
+  const onDescriptionChange = (event) => {
+    setDescription(event.target.value)
   }
 
-  onDescriptionChange = (event) => {
-    this.setState({
-      description: event.target.value,
-    })
+  const onMinChange = (event) => {
+    setMin(event.target.value)
   }
 
-  onMinChange = (event) => {
-    this.setState({
-      min: event.target.value,
-    })
+  const onSecChange = (event) => {
+    setSec(event.target.value)
   }
 
-  onSecChange = (event) => {
-    this.setState({
-      sec: event.target.value,
-    })
-  }
-
-  onSubmit = (event) => {
-    const { addNewTodoItem } = this.props
-    const { description, min, sec } = this.state
+  const onSubmit = (event) => {
     event.preventDefault()
 
     addNewTodoItem(description, min, sec)
-    this.setState({
-      description: '',
-      min: '',
-      sec: '',
-    })
+    setDescription('')
+    setMin('')
+    setSec('')
   }
 
-  render() {
-    const { description, min, sec } = this.state
-    return (
-      <form className="new-todo-form" onSubmit={this.onSubmit}>
-        <input
-          className="new-todo"
-          placeholder="What needs to be done?"
-          onChange={this.onDescriptionChange}
-          value={description}
-          required
-        />
-        <input
-          className="new-todo-form__timer"
-          placeholder="Min"
-          onChange={this.onMinChange}
-          value={min}
-          type="number"
-          min={0}
-          required
-        />
-        <input
-          className="new-todo-form__timer"
-          placeholder="Sec"
-          onChange={this.onSecChange}
-          value={sec}
-          type="number"
-          min={0}
-          required
-        />
-        <button type="submit" />
-      </form>
-    )
-  }
+  return (
+    <form className="new-todo-form" onSubmit={onSubmit}>
+      <input
+        className="new-todo"
+        placeholder="What needs to be done?"
+        onChange={onDescriptionChange}
+        value={description}
+        required
+      />
+      <input
+        className="new-todo-form__timer"
+        placeholder="Min"
+        onChange={onMinChange}
+        value={min}
+        type="number"
+        min={0}
+        required
+      />
+      <input
+        className="new-todo-form__timer"
+        placeholder="Sec"
+        onChange={onSecChange}
+        value={sec}
+        type="number"
+        min={0}
+        required
+      />
+      <button type="submit" />
+    </form>
+  )
 }
 
 NewTaskForm.propTypes = {

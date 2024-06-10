@@ -1,27 +1,35 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import propTypes from 'prop-types'
 import './task.css'
 
-export default class Task extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      editing: false,
-      value: '',
+function Task({
+  completed = false,
+  onEdit,
+  description = '',
+  deleteItem,
+  onToggleDone,
+  createdTimeAgo = 'some time ago',
+  id,
+  timer,
+  startTimer,
+  stopTimer,
+}) {
+  const [editing, setEditing] = useState(false)
+  const [value, setValue] = useState('')
+
+  const handleDocumentClick = (event) => {
+    const editInput = document.querySelector('.edit')
+    if (editInput && !editInput.contains(event.target)) {
+      setEditing(false)
     }
   }
 
-  componentDidMount() {
-    document.addEventListener('click', this.handleDocumentClick)
-  }
+  useEffect(() => {
+    document.addEventListener('click', handleDocumentClick)
+    return () => document.removeEventListener('click', handleDocumentClick)
+  }, [])
 
-  componentWillUnmount() {
-    document.removeEventListener('click', this.handleDocumentClick)
-  }
-
-  getTaskStatus = () => {
-    const { completed } = this.props
-    const { editing } = this.state
+  const getTaskStatus = () => {
     let str
     if (completed) {
       str = 'completed'
@@ -33,102 +41,75 @@ export default class Task extends Component {
     return str
   }
 
-  handleChange = (event) => {
-    this.setState({ value: event.target.value })
+  const handleChange = (event) => {
+    setValue(event.target.value)
   }
 
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
-    const { onEdit } = this.props
-    const { value } = this.state
     onEdit(value)
-    this.setState({ value: '', editing: false })
+    setValue('')
+    setEditing(false)
   }
 
-  onEscDown = (event) => {
+  const onEscDown = (event) => {
     if (event.keyCode === 27) {
-      this.setState({ editing: false })
+      setEditing(false)
     }
   }
 
-  handleDocumentClick = (event) => {
-    const editInput = document.querySelector('.edit')
-    if (editInput && !editInput.contains(event.target)) {
-      this.setState({ editing: false })
-    }
-  }
+  const taskStatus = getTaskStatus()
 
-  render() {
-    const {
-      description,
-      deleteItem,
-      onToggleDone,
-      createdTimeAgo,
-      id,
-      timer,
-      startTimer,
-      stopTimer,
-    } = this.props
-    const { value } = this.state
-    const taskStatus = this.getTaskStatus()
+  return (
+    <li className={taskStatus} key={id}>
+      <div className="view">
+        <input className="toggle" type="checkbox" onClick={onToggleDone} />
+        <label htmlFor="btn">
+          <span className="title">{description}</span>
+          <span className="description">
+            <button className="icon icon-play" type="button" onClick={startTimer} />
+            <button className="icon icon-pause" type="button" onClick={stopTimer} />
+            {`${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')}`}
+          </span>
+          <span className="description">{createdTimeAgo}</span>
+        </label>
+        <button
+          id="btn"
+          type="button"
+          className="icon icon-edit"
+          onClick={(event) => {
+            event.stopPropagation()
+            setValue(description)
+            setEditing((prevEditing) => !prevEditing.editing)
+          }}
+        />
 
-    return (
-      <li className={taskStatus} key={id}>
-        <div className="view">
-          <input className="toggle" type="checkbox" onClick={onToggleDone} />
-          <label htmlFor="btn">
-            <span className="title">{description}</span>
-            <span className="description">
-              <button className="icon icon-play" type="button" onClick={startTimer} />
-              <button className="icon icon-pause" type="button" onClick={stopTimer} />
-              {`${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, '0')}`}
-            </span>
-            <span className="description">{createdTimeAgo}</span>
-          </label>
-          <button
-            id="btn"
-            type="button"
-            className="icon icon-edit"
-            onClick={(event) => {
-              event.stopPropagation()
-              this.setState((prevState) => ({
-                editing: !prevState.editing,
-                value: description,
-              }))
-            }}
+        <button type="button" className="icon icon-destroy" onClick={deleteItem} />
+      </div>
+
+      {taskStatus === 'editing' && (
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            className="edit"
+            onChange={handleChange}
+            value={value}
+            onKeyDown={onEscDown}
+            // onClick={this.onWindowClick}
           />
-
-          <button type="button" className="icon icon-destroy" onClick={deleteItem} />
-        </div>
-
-        {taskStatus === 'editing' && (
-          <form onSubmit={this.handleSubmit}>
-            <input
-              type="text"
-              className="edit"
-              onChange={this.handleChange}
-              value={value}
-              onKeyDown={this.onEscDown}
-              // onClick={this.onWindowClick}
-            />
-          </form>
-        )}
-      </li>
-    )
-  }
+        </form>
+      )}
+    </li>
+  )
 }
 
-Task.defaultProps = {
-  completed: false,
-  description: '',
-  createdTimeAgo: 'some time ago',
-}
+export default Task
 
 Task.propTypes = {
-  completed: propTypes.bool,
-  description: propTypes.string,
+  completed: propTypes.bool.isRequired,
+  description: propTypes.string.isRequired,
   deleteItem: propTypes.func.isRequired,
   onToggleDone: propTypes.func.isRequired,
   onEdit: propTypes.func.isRequired,
-  createdTimeAgo: propTypes.string,
+  createdTimeAgo: propTypes.string.isRequired,
 }
